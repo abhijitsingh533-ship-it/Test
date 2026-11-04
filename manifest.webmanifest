@@ -1,0 +1,10 @@
+{
+  "name": "ASCEND Fitness",
+  "short_name": "ASCEND",
+  "start_url": "./",
+  "display": "standalone",
+  "background_color": "#101722",
+  "theme_color": "#111827",
+  "description": "Personal fitness, nutrition and habit tracker",
+  "icons": []
+}
