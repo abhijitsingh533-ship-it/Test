@@ -62,9 +62,10 @@ header{padding:22px 18px 12px;max-width:760px;margin:auto;display:flex;justify-c
  </div>
  <div id="food" class="hidden">
   <h2>Smart food journal</h2><div class="panel">
-   <label>Find a food</label><div class="row"><input id="foodSearch" placeholder="Try chicken breast, roti, paneer, oats..." style="flex:1"><button class="btn small" type="button" onclick="searchFoods()">Search</button></div>
+   <label>Search any food</label><div class="row"><input id="foodSearch" placeholder="Type e.g. cooked rajma, dosa, chicken breast, oats..." style="flex:1" autocomplete="off"><button class="btn small" type="button" onclick="searchFoods()">Search</button></div>
+   <small class="muted">Live search across generic foods and packaged products. Results update as you type.</small>
    <div id="foodResults" class="stack" style="margin-top:10px"></div>
-   <div class="notice" style="margin-top:12px">Choose a food result to fill nutrition automatically. You can still edit the values or enter them manually if a food isn't found.</div>
+   <div class="notice" style="margin-top:12px">Choose the closest match, then set the portion in grams. Generic nutrition values are estimates; packaged-food values depend on database entries. If a food is missing, use the manual fields or add its label below.</div>
    <details class="panel" style="margin:14px 0;background:var(--bg)">
     <summary style="font-weight:700;cursor:pointer">＋ Add from nutrition label</summary>
     <p class="muted">Photograph or upload the package label as a reference, then enter the values printed on it. ASCEND calculates the amount you actually consumed.</p>
@@ -218,30 +219,52 @@ function updateFoodMacros(){
  document.getElementById('foodFat').value=(selectedFood.f*factor).toFixed(1);
 }
 document.getElementById('portionGrams').addEventListener('input',updateFoodMacros);
+let foodSearchTimer=null, foodSearchRequest=0;
+function nutritionFromFdc(food){
+ const ns=food.foodNutrients||[];
+ const find=(num,name)=>{const n=ns.find(x=>String(x.nutrientNumber||x.nutrient?.number||'')===String(num)||String(x.nutrientName||x.nutrient?.name||'').toLowerCase()===name);return Number(n?.value??n?.amount??0)};
+ let kcal=find('1008','energy');
+ if(!kcal){const kj=find('1062','energy');if(kj)kcal=kj/4.184;}
+ const p=find('1003','protein'), c=find('1005','carbohydrate, by difference'), f=find('1004','total lipid (fat)');
+ if(!kcal && (p||c||f))kcal=p*4+c*4+f*9;
+ if(!food.description||!Number.isFinite(kcal)||kcal<=0||![p,c,f].every(Number.isFinite))return null;
+ return {name:food.description,kcal,p,c,f,source:'USDA FoodData Central · per 100g'};
+}
+function addFoodResult(list,item){if(item&&item.name&&Number.isFinite(item.kcal)&&item.kcal>0&&[item.p,item.c,item.f].every(Number.isFinite))list.push(item)}
 async function searchFoods(){
- const q=document.getElementById('foodSearch').value.trim(), box=document.getElementById('foodResults');
- if(!q){box.innerHTML='<small class="muted">Enter a food name first.</small>';return}
- box.innerHTML='<small class="muted">Searching foods…</small>';
+ const input=document.getElementById('foodSearch'), q=(input.value||'').trim(), box=document.getElementById('foodResults');
+ if(!q){box.innerHTML='<small class="muted">Start typing a food name to search.</small>';return}
+ const request=++foodSearchRequest;
+ box.innerHTML='<small class="muted">Searching live food databases…</small>';
  const local=commonFoods.filter(f=>f.name.toLowerCase().includes(q.toLowerCase())||q.toLowerCase().split(/\s+/).some(w=>w.length>2&&f.name.toLowerCase().includes(w)));
- let results=local.map(f=>({...f,source:f.source+' (local estimate)'}));
- try{
-  const url='https://world.openfoodfacts.org/cgi/search.pl?search_terms='+encodeURIComponent(q)+'&search_simple=1&action=process&json=1&page_size=8&fields=product_name,brands,nutriments,serving_size';
-  const r=await fetch(url,{headers:{'Accept':'application/json'}});
-  if(r.ok){const data=await r.json();(data.products||[]).forEach(prod=>{
-   const n=prod.nutriments||{}, kcal=Number(n['energy-kcal_100g']??n['energy-kcal']??(Number(n['energy-kj_100g'])/4.184));
-   const protein=Number(n.proteins_100g??n.proteins), carbs=Number(n.carbohydrates_100g??n.carbohydrates), fat=Number(n.fat_100g??n.fat);
-   if(prod.product_name&&Number.isFinite(kcal)&&kcal>0&&[protein,carbs,fat].every(Number.isFinite)){
-    results.push({name:prod.product_name+(prod.brands?' · '+prod.brands:''),kcal,p:protein,c:carbs,f:fat,source:'Open Food Facts · per 100g'});
-   }
-  })}
- }catch(err){/* local food matches remain available offline */}
- const unique=results.filter((f,i,a)=>a.findIndex(x=>x.name.toLowerCase()===f.name.toLowerCase())===i).slice(0,12);
- if(!unique.length){box.innerHTML='<small class="muted">No match found. Try another name or enter the nutrition manually below.</small>';return}
- box.innerHTML=unique.map((f,i)=>`<button type="button" class="btn secondary" style="text-align:left;display:flex;justify-content:space-between;gap:8px" onclick="chooseFoodResult(${i})"><span>${esc(f.name)}<br><small>${Math.round(f.kcal)} kcal · P ${f.p.toFixed(1)}g · C ${f.c.toFixed(1)}g · F ${f.f.toFixed(1)}g / 100g</small></span><span>+</span></button>`).join('');
+ let results=[];local.forEach(f=>addFoodResult(results,{...f,source:f.source+' · local estimate'}));
+ const tasks=[];
+ // USDA FoodData Central includes generic ingredients and prepared foods. DEMO_KEY is intentionally
+ // used for a no-setup prototype; it has a low public demo quota. Production use should proxy a private key.
+ tasks.push((async()=>{
+  try{
+   const url='https://api.nal.usda.gov/fdc/v1/foods/search?api_key=DEMO_KEY&query='+encodeURIComponent(q)+'&pageSize=12&dataType=Foundation,SR%20Legacy,Survey%20(FNDDS),Branded';
+   const r=await fetch(url);if(!r.ok)throw new Error('USDA '+r.status);const data=await r.json();
+   (data.foods||[]).forEach(food=>{const item=nutritionFromFdc(food);if(item){item.name=food.description+(food.brandOwner?' · '+food.brandOwner:'');addFoodResult(results,item)}});
+  }catch(e){/* other database and manual entry remain available */}
+ })());
+ tasks.push((async()=>{
+  try{
+   const url='https://world.openfoodfacts.org/cgi/search.pl?search_terms='+encodeURIComponent(q)+'&search_simple=1&action=process&json=1&page_size=12&fields=product_name,generic_name,brands,nutriments,serving_size';
+   const r=await fetch(url,{headers:{'Accept':'application/json'}});if(!r.ok)throw new Error('OFF '+r.status);const data=await r.json();
+   (data.products||[]).forEach(prod=>{const n=prod.nutriments||{};let kcal=Number(n['energy-kcal_100g']??n['energy-kcal']);if(!Number.isFinite(kcal)||kcal<=0){const kj=Number(n['energy-kj_100g']??n['energy-kj']);kcal=Number.isFinite(kj)?kj/4.184:0}const p=Number(n.proteins_100g),c=Number(n.carbohydrates_100g),f=Number(n.fat_100g);if(prod.product_name)addFoodResult(results,{name:prod.product_name+(prod.brands?' · '+prod.brands:''),kcal,p,c,f,source:'Open Food Facts · per 100g'})});
+  }catch(e){/* USDA/local results remain available */}
+ })());
+ await Promise.all(tasks);
+ if(request!==foodSearchRequest)return;
+ const unique=results.filter((f,i,a)=>a.findIndex(x=>x.name.toLowerCase()===f.name.toLowerCase())===i).slice(0,16);
  window.currentFoodResults=unique;
+ if(!unique.length){box.innerHTML='<div class="notice">No reliable database match found for “'+esc(q)+'”. Try a shorter name or a more general ingredient (e.g. “rajma” instead of a full recipe). You can still enter nutrition manually or use Add from nutrition label.</div>';return}
+ box.innerHTML=unique.map((f,i)=>`<button type="button" class="btn secondary" style="text-align:left;display:flex;justify-content:space-between;gap:8px" onclick="chooseFoodResult(${i})"><span>${esc(f.name)}<br><small>${Math.round(f.kcal)} kcal · P ${f.p.toFixed(1)}g · C ${f.c.toFixed(1)}g · F ${f.f.toFixed(1)}g / 100g<br>${esc(f.source)}</small></span><span>+</span></button>`).join('');
 }
 function chooseFoodResult(i){if(window.currentFoodResults&&window.currentFoodResults[i])setFoodSelection(window.currentFoodResults[i])}
-document.getElementById('foodSearch').addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();searchFoods()}});
+document.getElementById('foodSearch').addEventListener('input',()=>{clearTimeout(foodSearchTimer);const q=document.getElementById('foodSearch').value.trim();if(q.length<2){document.getElementById('foodResults').innerHTML=q?'<small class="muted">Type at least 2 characters…</small>':'';return}foodSearchTimer=setTimeout(searchFoods,650)});
+document.getElementById('foodSearch').addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();clearTimeout(foodSearchTimer);searchFoods()}});
 let labelPhotoData=null;
 function savedNutritionLabels(){return JSON.parse(localStorage.getItem('ascendNutritionLabels')||'[]')}
 function refreshSavedLabels(){let arr=savedNutritionLabels(),wrap=document.getElementById('savedLabelsWrap'),sel=document.getElementById('savedLabels');if(!arr.length){wrap.classList.add('hidden');return}wrap.classList.remove('hidden');sel.innerHTML='<option value="">Choose a saved product</option>'+arr.map((x,i)=>`<option value="${i}">${esc(x.name)}</option>`).join('')}
