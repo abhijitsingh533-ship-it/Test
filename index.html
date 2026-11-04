@@ -1,0 +1,280 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#111827"><title>ASCEND Fitness</title>
+<link rel="manifest" href="manifest.webmanifest">
+<style>
+:root{color-scheme:light dark;--bg:#f4f6fa;--panel:#fff;--text:#182033;--muted:#697386;--line:#e3e7ef;--accent:#287c65;--soft:#e6f3ee;--shadow:0 8px 28px #1820330c}
+:root[data-theme="dark"]{color-scheme:dark;--bg:#101722;--panel:#192332;--text:#eef3fa;--muted:#a5b1c2;--line:#2b394b;--accent:#70d2aa;--soft:#203d37;--shadow:none}
+@media(prefers-color-scheme:dark){:root[data-theme="system"]{color-scheme:dark;--bg:#101722;--panel:#192332;--text:#eef3fa;--muted:#a5b1c2;--line:#2b394b;--accent:#70d2aa;--soft:#203d37;--shadow:none}}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--text);font:15px/1.45 -apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;padding-bottom:82px}
+header{padding:22px 18px 12px;max-width:760px;margin:auto;display:flex;justify-content:space-between;align-items:center}h1{font-size:24px;letter-spacing:.12em;margin:0}h2{font-size:19px;margin:0 0 14px}h3{font-size:15px;margin:0 0 8px}.muted,small{color:var(--muted)}main{max-width:760px;margin:auto;padding:8px 16px 28px}.panel{background:var(--panel);border:1px solid var(--line);border-radius:18px;padding:16px;margin:12px 0;box-shadow:var(--shadow)}.row{display:flex;gap:10px;align-items:center}.between{justify-content:space-between}.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}.metric{background:var(--bg);border-radius:13px;padding:12px}.metric strong{display:block;font-size:23px;margin-top:3px}.btn{border:0;border-radius:12px;padding:12px 15px;background:var(--accent);color:#fff;font-weight:650;cursor:pointer}.btn.secondary{background:var(--soft);color:var(--text);border:1px solid var(--line)}.btn.small{padding:8px 11px;font-size:13px}.tabs{position:fixed;bottom:0;left:0;right:0;background:var(--panel);border-top:1px solid var(--line);display:flex;justify-content:center;gap:4px;padding:8px max(8px,env(safe-area-inset-right)) calc(8px + env(safe-area-inset-bottom));z-index:3}.tabs button{background:none;border:0;color:var(--muted);padding:8px 13px;border-radius:10px;font-size:12px}.tabs button.active{background:var(--soft);color:var(--accent);font-weight:700}label{display:block;font-size:13px;color:var(--muted);margin:10px 0 5px}input,select{width:100%;padding:11px;border:1px solid var(--line);border-radius:10px;background:var(--bg);color:var(--text);font:inherit}form .grid{gap:8px}.progress{height:8px;border-radius:10px;background:var(--line);overflow:hidden;margin:7px 0 12px}.progress span{display:block;height:100%;background:var(--accent);border-radius:10px}.food{display:flex;justify-content:space-between;gap:10px;padding:10px 0;border-bottom:1px solid var(--line)}.food:last-child{border:0}.hidden{display:none!important}.mealrow{display:grid;grid-template-columns:1fr 1fr;gap:8px}.notice{background:var(--soft);padding:11px;border-radius:12px;color:var(--text);font-size:13px}.tag{font-size:11px;background:var(--soft);padding:4px 8px;border-radius:99px;color:var(--accent)}.stack{display:grid;gap:8px}.right{text-align:right}
+</style>
+</head>
+<body>
+<header><div><h1>ASCEND</h1><small>FITNESS · NUTRITION · CONSISTENCY</small></div><button class="btn secondary small" id="themeBtn">System theme</button></header>
+<main>
+<section id="setup" class="hidden">
+ <div class="panel"><span class="tag">WELCOME</span><h2 style="margin-top:10px">Build your daily routine</h2><p class="muted">Set your schedule and goals once. You can change them any time in Settings.</p>
+ <form id="setupForm">
+  <div class="grid"><div><label>Your name</label><input name="name" placeholder="Name"></div><div><label>Fitness goal</label><select name="goal"><option>Build muscle</option><option>Fat loss</option><option>Improve fitness</option><option>Maintain weight</option><option>Endurance</option></select></div></div>
+  <label>Nutrition approach</label><select name="nutritionMode" id="nutritionMode"><option value="manual">Manual macro targets</option><option value="balanced">Balanced plan based on my body</option></select>
+  <div id="bodyFields" class="hidden"><h3 style="margin-top:16px">About your body</h3><div class="grid">
+   <div><label>Age</label><input name="age" type="number" min="16" max="100" value="27"></div><div><label>Sex used for calorie estimate</label><select name="sex"><option value="male">Male</option><option value="female">Female</option></select></div>
+   <div><label>Height (cm)</label><input name="height" type="number" min="100" max="230" value="175"></div><div><label>Weight (kg)</label><input name="weight" type="number" min="30" max="300" step=".1" value="80"></div>
+   <div><label>Activity level</label><select name="activity"><option value="1.2">Mostly sitting / little exercise</option><option value="1.375">Light activity (1–3 days/week)</option><option value="1.55" selected>Moderate activity (3–5 days/week)</option><option value="1.725">Very active (6–7 days/week)</option><option value="1.9">Highly active / physical job</option></select></div>
+   <div><label>Diet preference</label><select name="diet"><option value="nonveg">Non-vegetarian</option><option value="eggetarian">Eggetarian</option><option value="vegetarian">Vegetarian</option><option value="vegan">Vegan</option></select></div>
+  </div><p class="muted">These are starting estimates, not medical prescriptions. Adjust based on progress, appetite and professional advice where needed.</p><div class="notice" id="planPreview">Your suggested targets will be calculated when you save your profile.</div></div>
+  <h3 style="margin-top:18px">Daily nutrition targets</h3><p class="muted" id="targetHelp">Enter your own daily targets. You can update them any time.</p><div class="grid" id="manualTargets">
+  <div><label>Calories (kcal)</label><input name="calories" type="number" min="1" value="2200" required></div><div><label>Protein (g)</label><input name="protein" type="number" min="1" value="150" required></div>
+  <div><label>Carbs (g)</label><input name="carbs" type="number" min="1" value="220" required></div><div><label>Fat (g)</label><input name="fat" type="number" min="1" value="70" required></div></div>
+  <h3 style="margin-top:18px">Your activity routine</h3>
+  <p class="muted">Tell ASCEND what you actually do. Training habits will only count on the days you schedule them.</p>
+  <div class="grid">
+   <div><label>Daily step target</label><input name="stepTarget" type="number" min="1000" step="500" value="10000"></div>
+   <div><label>Sleep target (hours)</label><input name="sleepGoal" type="number" min="4" max="12" step=".5" value="8"></div>
+   <div><label>Daily screen-time limit (hours)</label><input name="screenGoal" type="number" min="1" max="16" step=".5" value="3"></div>
+   <div><label>Walking routine</label><select name="walking"><option value="daily">Walk most days</option><option value="some">A few days per week</option><option value="none">No planned walks</option></select></div>
+  </div>
+  <label>Strength training days</label><div class="grid">${['Mon','Tue','Wed','Thu','Fri','Sat','Sun'].map((d,i)=>`<label><input type="checkbox" name="strengthDays" value="${i}" ${[0,2,4,6].includes(i)?'checked':''} style="width:auto"> ${d}</label>`).join('')}</div>
+  <label>Running / cardio days</label><div class="grid">${['Mon','Tue','Wed','Thu','Fri','Sat','Sun'].map((d,i)=>`<label><input type="checkbox" name="runDays" value="${i}" ${[1,3,5].includes(i)?'checked':''} style="width:auto"> ${d}</label>`).join('')}</div>
+  <div class="notice">You can choose no strength or running days. Rest days are respected and won't lower your habit score.</div>
+  <h3 style="margin-top:18px">Your meal schedule</h3><p class="muted">Choose the time window when you usually eat each meal.</p>
+  <div id="mealInputs" class="stack"></div>
+  <div class="grid"><div><label>Water goal (ml)</label><input name="waterGoal" type="number" value="2500" min="250"></div><div><label>Reminder start</label><input name="reminderStart" type="time" value="08:00"></div></div>
+  <label><input name="waterReminders" type="checkbox" checked style="width:auto"> Hourly water reminders</label>
+  <label><input name="mealReminders" type="checkbox" checked style="width:auto"> Meal reminders 20 minutes before</label>
+  <button class="btn" style="width:100%;margin-top:16px">Save my routine</button>
+ </form></div>
+</section>
+<section id="app" class="hidden">
+ <div id="dashboard">
+  <div class="row between"><div><small id="today"></small><h2 id="hello">Your day, your pace.</h2></div><span class="tag" id="goalTag"></span></div>
+  <div class="panel"><div class="row between"><h2>Nutrition today</h2><button class="btn small" onclick="showTab('food')">+ Log food</button></div>
+   <div class="grid" id="macroCards"></div><div class="notice" id="remaining" style="margin-top:12px"></div>
+  </div>
+  <div class="panel"><div class="row between"><h2>Today's routine</h2><button class="btn secondary small" onclick="showTab('settings')">Edit</button></div><div id="schedule"></div></div>
+  <div class="panel"><div class="row between"><h2>Daily habits</h2><span class="tag" id="habitScore">0 / 100</span></div><p class="muted">Tick off your habits as you complete them.</p><div id="habitList"></div><div class="progress"><span id="habitBar"></span></div><small id="habitNote" class="muted"></small></div>
+  <div class="panel"><div class="row between"><h2>Water</h2><span id="waterCount" class="tag"></span></div><div class="progress"><span id="waterBar"></span></div><div class="row"><button class="btn small" onclick="addWater(250)">+ 250 ml</button><button class="btn secondary small" onclick="addWater(500)">+ 500 ml</button></div></div>
+  <div class="panel"><h2>Daily food review</h2><div id="dailyReview" class="muted">Log food to see your daily review.</div></div>
+  <div class="panel"><h2>What can improve?</h2><div id="improvements" class="muted">Your suggestions will appear as you log meals, macros and water.</div></div>
+ </div>
+ <div id="food" class="hidden">
+  <h2>Smart food journal</h2><div class="panel">
+   <label>Find a food</label><div class="row"><input id="foodSearch" placeholder="Try chicken breast, roti, paneer, oats..." style="flex:1"><button class="btn small" type="button" onclick="searchFoods()">Search</button></div>
+   <div id="foodResults" class="stack" style="margin-top:10px"></div>
+   <div class="notice" style="margin-top:12px">Choose a food result to fill nutrition automatically. You can still edit the values or enter them manually if a food isn't found.</div>
+   <details class="panel" style="margin:14px 0;background:var(--bg)">
+    <summary style="font-weight:700;cursor:pointer">＋ Add from nutrition label</summary>
+    <p class="muted">Photograph or upload the package label as a reference, then enter the values printed on it. ASCEND calculates the amount you actually consumed.</p>
+    <label>Upload label photo (optional)</label><input id="labelPhoto" type="file" accept="image/*" capture="environment">
+    <img id="labelPreview" class="hidden" alt="Nutrition label preview" style="max-width:100%;max-height:220px;object-fit:contain;border-radius:10px;margin-top:8px">
+    <form id="labelForm" style="margin-top:12px">
+     <label>Product name</label><input name="labelName" placeholder="e.g. High protein Greek yogurt" required>
+     <div class="grid">
+      <div><label>Label basis</label><select name="basis"><option value="serving">Per serving</option><option value="100">Per 100 g / ml</option></select></div>
+      <div><label>Serving size (g / ml)</label><input name="servingSize" type="number" min="0.1" step=".1" value="100" required></div>
+      <div><label>Amount you ate (g / ml)</label><input name="amountEaten" type="number" min="0.1" step=".1" value="100" required></div>
+      <div><label>Meal</label><select name="labelMeal" id="labelMeal"></select></div>
+     </div>
+     <h3 style="margin-top:12px">Nutrition values from the label</h3>
+     <div class="grid">
+      <div><label>Calories (kcal)</label><input name="labelCalories" type="number" min="0" step=".1" value="0" required></div>
+      <div><label>Protein (g)</label><input name="labelProtein" type="number" min="0" step=".1" value="0" required></div>
+      <div><label>Carbs (g)</label><input name="labelCarbs" type="number" min="0" step=".1" value="0" required></div>
+      <div><label>Fat (g)</label><input name="labelFat" type="number" min="0" step=".1" value="0" required></div>
+     </div>
+     <div class="metric" style="margin-top:12px"><small>Estimated macros for the amount eaten</small><strong id="labelPreviewMacros">0 kcal</strong><small id="labelPreviewDetails">P 0g · C 0g · F 0g</small></div>
+     <label><input name="saveLabel" type="checkbox" checked style="width:auto"> Save this product for quick reuse</label>
+     <button class="btn" style="width:100%;margin-top:12px">Add consumed amount to journal</button>
+    </form>
+    <div id="savedLabelsWrap" class="hidden" style="margin-top:14px"><label>Previously saved labels</label><select id="savedLabels"><option value="">Choose a saved product</option></select></div>
+   </details>
+   <form id="foodForm" style="margin-top:12px">
+    <label>Food name</label><input name="food" id="foodName" placeholder="Select a result or type food name" required>
+    <div class="grid"><div><label>Meal</label><select name="meal" id="foodMeal"></select></div><div><label>Portion (grams)</label><input id="portionGrams" type="number" min="1" value="100"></div></div>
+    <div class="grid"><div><label>Calories (kcal)</label><input name="calories" id="foodCalories" type="number" min="0" step=".1" value="0"></div>
+    <div><label>Protein (g)</label><input name="protein" id="foodProtein" type="number" min="0" step=".1" value="0"></div>
+    <div><label>Carbs (g)</label><input name="carbs" id="foodCarbs" type="number" min="0" step=".1" value="0"></div>
+    <div><label>Fat (g)</label><input name="fat" id="foodFat" type="number" min="0" step=".1" value="0"></div></div>
+    <small id="foodSource" class="muted">Nutrition values are estimates. Check the source and serving size.</small>
+    <button class="btn" style="width:100%;margin-top:14px">Add to food journal</button>
+   </form>
+  </div><div class="panel"><div class="row between"><h2>Consumed today</h2><span class="tag" id="foodCount">0 items</span></div><div id="foodList"></div></div>
+  <div class="notice">Common foods use typical per-100g estimates. Packaged products can be looked up through Open Food Facts. Homemade recipes vary with ingredients, oil and preparation, so review estimates before saving.</div>
+ </div>
+ <div id="scoreboard" class="hidden">
+  <h2>Community scoreboard</h2>
+  <div class="panel"><div class="row between"><h2>Weekly rankings</h2><span class="tag">Coming next</span></div>
+   <p class="muted">Your community leaderboard will rank members by their average daily ASCEND score for the week. Rankings will use verified daily habit logs and reset every Monday.</p>
+   <div class="notice"><b>Private preview:</b> Your current score is stored on this device only. Shared rankings need user accounts and a secure cloud database. No other users' scores are displayed until that is connected.</div>
+   <div class="metric" style="margin-top:12px"><small>Your current daily score</small><strong id="myScore">—</strong><small>Finish setting up your routine and habits to start scoring.</small></div>
+  </div>
+ </div>
+ <div id="settings" class="hidden">
+  <h2>Settings & routine</h2><div class="panel"><form id="settingsForm">
+   <div class="grid"><div><label>Name</label><input name="name"></div><div><label>Nutrition mode</label><select name="nutritionMode"><option value="manual">Manual macro targets</option><option value="balanced">Balanced plan based on my body</option></select></div><div><label>Age</label><input name="age" type="number"></div><div><label>Sex for estimate</label><select name="sex"><option value="male">Male</option><option value="female">Female</option></select></div><div><label>Height (cm)</label><input name="height" type="number"></div><div><label>Weight (kg)</label><input name="weight" type="number" step=".1"></div><div><label>Activity</label><select name="activity"><option value="1.2">Mostly sitting</option><option value="1.375">Light</option><option value="1.55">Moderate</option><option value="1.725">Very active</option><option value="1.9">Highly active</option></select></div><div><label>Diet preference</label><select name="diet"><option value="nonveg">Non-vegetarian</option><option value="eggetarian">Eggetarian</option><option value="vegetarian">Vegetarian</option><option value="vegan">Vegan</option></select></div><div><label>Goal</label><select name="goal"><option>Build muscle</option><option>Fat loss</option><option>Improve fitness</option><option>Maintain weight</option><option>Endurance</option></select></div>
+   <div><label>Calories</label><input name="calories" type="number"></div><div><label>Protein (g)</label><input name="protein" type="number"></div><div><label>Carbs (g)</label><input name="carbs" type="number"></div><div><label>Fat (g)</label><input name="fat" type="number"></div><div><label>Water goal (ml)</label><input name="waterGoal" type="number"></div></div>
+   <h3 style="margin-top:16px">Activity routine</h3>
+   <div class="grid"><div><label>Step target</label><input name="stepTarget" type="number"></div><div><label>Sleep target (hours)</label><input name="sleepGoal" type="number" step=".5"></div><div><label>Screen limit (hours)</label><input name="screenGoal" type="number" step=".5"></div><div><label>Walking</label><select name="walking"><option value="daily">Most days</option><option value="some">Some days</option><option value="none">Not planned</option></select></div></div>
+   <label>Strength days</label><div class="grid">${['Mon','Tue','Wed','Thu','Fri','Sat','Sun'].map((d,i)=>`<label><input type="checkbox" name="strengthDays" value="${i}" style="width:auto"> ${d}</label>`).join('')}</div>
+   <label>Run / cardio days</label><div class="grid">${['Mon','Tue','Wed','Thu','Fri','Sat','Sun'].map((d,i)=>`<label><input type="checkbox" name="runDays" value="${i}" style="width:auto"> ${d}</label>`).join('')}</div>
+   <h3 style="margin-top:16px">Meal windows</h3><div id="editMealInputs" class="stack"></div>
+   <label><input name="waterReminders" type="checkbox" style="width:auto"> Hourly water reminders</label>
+   <label><input name="mealReminders" type="checkbox" style="width:auto"> Meal reminders 20 minutes before</label>
+   <button class="btn" style="width:100%;margin-top:14px">Save settings</button>
+  </form></div>
+  <div class="panel"><h3>Notifications</h3><p class="muted">Allow notifications to receive reminders. On iPhone, install this app to your Home Screen first. Browser background scheduling may be limited; reliable reminders while the app is closed require a push-notification service.</p><button class="btn secondary" onclick="enableNotifications()">Enable notifications</button> <span id="notifStatus" class="muted"></span></div>
+  <div class="panel"><h3>Appearance</h3><select id="themeSelect"><option value="system">System</option><option value="dark">Dark</option><option value="light">Light</option></select></div>
+  <button class="btn secondary" onclick="resetApp()">Reset app data</button>
+ </div>
+</section>
+</main>
+<nav class="tabs hidden" id="tabs"><button class="active" data-tab="dashboard">Today</button><button data-tab="food">Food</button><button data-tab="scoreboard">Ranks</button><button data-tab="settings">Settings</button></nav>
+<script>
+const mealNames=['Breakfast','Morning snack','Lunch','Evening snack','Dinner'];
+const defaults=[['Breakfast','08:00','09:00'],['Morning snack','10:30','11:00'],['Lunch','13:00','14:00'],['Evening snack','16:30','17:00'],['Dinner','19:30','20:30']];
+let state=JSON.parse(localStorage.getItem('forgeData')||'null');
+let todayKey=new Date().toLocaleDateString('en-CA');
+function save(){localStorage.setItem('forgeData',JSON.stringify(state))}
+function num(v){return Number(v)||0}
+function buildMealInputs(target){document.getElementById(target).innerHTML=defaults.map((m,i)=>`<div class="mealrow"><div><label>${m[0]} · start</label><input type="time" name="start${i}" value="${m[1]}"></div><div><label>${m[0]} · end</label><input type="time" name="end${i}" value="${m[2]}"></div></div>`).join('')}
+buildMealInputs('mealInputs');buildMealInputs('editMealInputs');
+function updateModeFields(){let balanced=document.getElementById('nutritionMode').value==='balanced';document.getElementById('bodyFields').classList.toggle('hidden',!balanced);document.getElementById('manualTargets').classList.toggle('hidden',balanced);document.getElementById('targetHelp').textContent=balanced?'Targets will be estimated from your body profile and activity.':'Enter your own daily targets. You can update them any time.'}
+document.getElementById('nutritionMode').onchange=updateModeFields;updateModeFields();
+function formObj(f){let o=Object.fromEntries(new FormData(f).entries());o.strengthDays=new FormData(f).getAll('strengthDays');o.runDays=new FormData(f).getAll('runDays');return o}
+function estimateTargets(o){
+ const age=num(o.age),h=num(o.height),w=num(o.weight),activity=num(o.activity)||1.55;
+ if(!age||!h||!w) return null;
+ const bmr=10*w+6.25*h-5*age+(o.sex==='male'?5:-161);
+ let kcal=bmr*activity;
+ if(o.goal==='Fat loss')kcal*=0.85; else if(o.goal==='Build muscle')kcal*=1.08;
+ kcal=Math.round(kcal/50)*50;
+ const protein=Math.round(w*(o.goal==='Fat loss'?1.8:1.7));
+ const fat=Math.round(kcal*.27/9);
+ const carbs=Math.max(0,Math.round((kcal-protein*4-fat*9)/4));
+ return {calories:kcal,protein,carbs,fat};
+}
+function applySetup(o){let targets=o.nutritionMode==='balanced'?estimateTargets(o):null;if(o.nutritionMode==='balanced'&&!targets){alert('Please complete age, height and weight for the balanced plan.');return}
+ const vals=targets||{calories:num(o.calories),protein:num(o.protein),carbs:num(o.carbs),fat:num(o.fat)};
+ state={profile:{name:o.name||'there',goal:o.goal,nutritionMode:o.nutritionMode||'manual',age:num(o.age),sex:o.sex,height:num(o.height),weight:num(o.weight),activity:num(o.activity),diet:o.diet||'nonveg',...vals,stepTarget:num(o.stepTarget)||10000,sleepGoal:num(o.sleepGoal)||8,screenGoal:num(o.screenGoal)||3,walking:o.walking||'daily',strengthDays:o.strengthDays||[],runDays:o.runDays||[],...vals,waterGoal:num(o.waterGoal),waterReminders:o.waterReminders==='on',mealReminders:o.mealReminders==='on',meals:mealNames.map((name,i)=>({name,start:o['start'+i],end:o['end'+i]}))},days:{}};save();startApp()}
+document.getElementById('setupForm').onsubmit=e=>{e.preventDefault();applySetup(formObj(e.target))};
+function day(){if(!state.days[todayKey])state.days[todayKey]={foods:[],water:0};return state.days[todayKey]}
+function totals(){return day().foods.reduce((a,f)=>{['calories','protein','carbs','fat'].forEach(k=>a[k]+=num(f[k]));return a},{calories:0,protein:0,carbs:0,fat:0})}
+function startApp(){document.getElementById('setup').classList.add('hidden');document.getElementById('app').classList.remove('hidden');document.getElementById('tabs').classList.remove('hidden');render();fillSettings()}
+
+const habitDefs=[{id:'clean',label:'Eat clean',weight:15},{id:'steps',label:'Hit step target',weight:15},{id:'water',label:'Meet water target',weight:10},{id:'strength',label:'Strength training',weight:20,days:'strengthDays'},{id:'run',label:'Run / cardio',weight:15,days:'runDays'},{id:'sleep',label:'Sleep target',weight:15},{id:'phone',label:'Stay within screen-time limit',weight:10}];
+function habitData(){let d=day();if(!d.habits)d.habits={};return d.habits}
+function isScheduled(h){if(!h.days)return true;let arr=state.profile[h.days]||[];return arr.map(Number).includes(new Date().getDay()===0?6:new Date().getDay()-1)}
+function habitScore(){let active=habitDefs.filter(h=>isScheduled(h));let max=active.reduce((a,h)=>a+h.weight,0);let earned=active.reduce((a,h)=>a+(habitData()[h.id]?h.weight:0),0);return max?Math.round(earned/max*100):0}
+function toggleHabit(id,checked){habitData()[id]=checked;save();renderHabits()}
+function renderHabits(){let active=habitDefs.filter(isScheduled),score=habitScore(),d=habitData();document.getElementById('habitList').innerHTML=active.map(h=>`<label class="row between" style="padding:9px 0;border-bottom:1px solid var(--line);color:var(--text)"><span><input type="checkbox" style="width:auto;margin-right:9px" ${d[h.id]?'checked':''} onchange="toggleHabit('${h.id}',this.checked)"> ${h.label}</span><small>${h.weight} pts</small></label>`).join('')+(habitDefs.some(h=>!isScheduled(h))?'<p class="muted" style="font-size:12px">Scheduled training days only are scored. Today’s rest-day activities are not penalized.</p>':'');document.getElementById('habitScore').textContent=score+' / 100';document.getElementById('habitBar').style.width=score+'%';document.getElementById('habitNote').textContent=`${active.filter(h=>d[h.id]).length} of ${active.length} scheduled habits completed`;let my=document.getElementById('myScore');if(my)my.textContent=score+' / 100'}
+function render(){let p=state.profile,t=totals(),d=day();document.getElementById('today').textContent=new Date().toLocaleDateString(undefined,{weekday:'long',month:'long',day:'numeric'});document.getElementById('hello').textContent=`${p.name ? 'Hello, '+p.name : 'Your day'}, let's make it count.`;document.getElementById('goalTag').textContent=p.goal;
+ const defs=[['Calories','calories','kcal'],['Protein','protein','g'],['Carbs','carbs','g'],['Fat','fat','g']];
+ document.getElementById('macroCards').innerHTML=defs.map(([label,k,u])=>`<div class="metric"><small>${label}</small><strong>${Math.round(t[k]*10)/10} <small>${u}</small></strong><div class="progress"><span style="width:${Math.min(100,t[k]/Math.max(1,p[k])*100)}%"></span></div><small>${Math.max(0,Math.round((p[k]-t[k])*10)/10)} ${u} remaining</small></div>`).join('');
+ document.getElementById('remaining').innerHTML=`<b>Still available today:</b> ${Math.max(0,p.calories-t.calories)} kcal · ${Math.max(0,p.protein-t.protein)}g protein · ${Math.max(0,p.carbs-t.carbs)}g carbs · ${Math.max(0,p.fat-t.fat)}g fat`;
+ document.getElementById('schedule').innerHTML=p.meals.map(m=>`<div class="food"><div><b>${m.name}</b><br><small>${m.start}–${m.end}</small></div><small>${d.foods.filter(f=>f.meal===m.name).length} logged</small></div>`).join('');
+ document.getElementById('waterCount').textContent=`${d.water} / ${p.waterGoal} ml`;document.getElementById('waterBar').style.width=Math.min(100,d.water/Math.max(1,p.waterGoal)*100)+'%';
+ document.getElementById('dailyReview').innerHTML=d.foods.length?`You logged <b>${d.foods.length} items</b>. You have consumed <b>${Math.round(t.calories)} kcal</b>, with ${Math.round(t.protein)}g protein, ${Math.round(t.carbs)}g carbs and ${Math.round(t.fat)}g fat. ${t.protein>=p.protein?'Protein target reached.':'You have '+Math.round(p.protein-t.protein)+'g protein left to reach your target.'}`:'Log food to see your daily review.';
+ let tips=[];if(t.protein<p.protein*.9)tips.push('Protein is below target. Consider adding a protein-rich option to a meal.');if(t.calories>p.calories*1.1)tips.push('Calories are above your target today. Review portions and snack choices without skipping meals.');if(t.calories<p.calories*.7&&new Date().getHours()>=18)tips.push('Your logged energy intake looks low for the day. Check that you have logged everything and eaten enough.');if(d.water<p.waterGoal)tips.push(`Hydration is ${Math.round(d.water/p.waterGoal*100)}% of your chosen goal. Keep water accessible and sip regularly.`);if(d.foods.length<3)tips.push('Your food log has fewer than three entries. Check whether meals or snacks are missing.');if(habitScore()<70)tips.push('Your habit score is '+habitScore()+'/100. Choose one or two unfinished habits to focus on rather than trying to change everything at once.');if(!tips.length)tips.push('Good consistency so far. Keep meals varied and include vegetables, fruit and fibre-rich foods.');tips.push('For tomorrow: plan one or two balanced meals ahead and review your routine if meal timing felt difficult.');document.getElementById('improvements').innerHTML='<ul>'+tips.map(x=>'<li>'+esc(x)+'</li>').join('')+'</ul>';
+ renderHabits();document.getElementById('foodCount').textContent=d.foods.length+' items';document.getElementById('foodList').innerHTML=d.foods.length?d.foods.map((f,i)=>`<div class="food"><div><b>${esc(f.food)}</b><br><small>${esc(f.meal)} · ${f.portionGrams?f.portionGrams+'g · ':''}${f.calories} kcal · P ${f.protein}g · C ${f.carbs}g · F ${f.fat}g${f.source?' · '+esc(f.source):''}</small></div><button class="btn secondary small" onclick="removeFood(${i})">Remove</button></div>`).join(''):'<p class="muted">No food logged yet.</p>';
+ document.getElementById('foodMeal').innerHTML=p.meals.map(m=>`<option>${m.name}</option>`).join('');document.getElementById('labelMeal').innerHTML=p.meals.map(m=>`<option>${m.name}</option>`).join('');
+}
+function esc(s){return String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
+const commonFoods=[
+ {name:'Chicken breast, cooked',kcal:165,p:31,c:0,f:3.6,source:'Typical cooked chicken breast estimate'},
+ {name:'Chicken breast, raw',kcal:120,p:22.5,c:0,f:2.6,source:'Typical raw chicken breast estimate'},
+ {name:'Egg, whole',kcal:143,p:12.6,c:0.7,f:9.5,source:'Typical whole egg estimate'},
+ {name:'Roti / chapati',kcal:297,p:9.8,c:55.7,f:7.5,source:'Typical plain wheat chapati estimate'},
+ {name:'Cooked white rice',kcal:130,p:2.7,c:28.2,f:0.3,source:'Typical cooked white rice estimate'},
+ {name:'Rajma, cooked',kcal:127,p:8.7,c:22.8,f:0.5,source:'Typical boiled kidney beans estimate'},
+ {name:'Dal, cooked',kcal:116,p:9,c:20,f:0.4,source:'Typical cooked lentils estimate; recipe varies'},
+ {name:'Paneer',kcal:265,p:18.3,c:1.2,f:20.8,source:'Typical paneer estimate; brand/fat level varies'},
+ {name:'Soya chunks, dry',kcal:345,p:52,c:33,f:0.5,source:'Typical dry soya chunks estimate'},
+ {name:'Oats, dry',kcal:389,p:16.9,c:66.3,f:6.9,source:'Typical rolled oats estimate'},
+ {name:'Greek yogurt, plain',kcal:73,p:10,c:3.9,f:1.9,source:'Typical plain Greek yogurt estimate'},
+ {name:'Milk, low fat',kcal:-м, p:3.4,c:5,f:1.5,source:'Typical low-fat milk estimate'},
+ {name:'Banana',kcal:89,p:1.1,c:22.8,f:0.3,source:'Typical banana estimate'},
+ {name:'Apple',kcal:52,p:0.3,c:13.8,f:0.2,source:'Typical apple estimate'},
+ {name:'Almonds',kcal:579,p:21.2,c:21.6,f:49.9,source:'Typical almonds estimate'},
+ {name:'Peanut butter',kcal:588,p:25,c:20,f:50,source:'Typical peanut butter estimate'}
+].filter(x=>typeof x.kcal==='number');
+let selectedFood=null;
+function setFoodSelection(item){
+ selectedFood=item;
+ document.getElementById('foodName').value=item.name;
+ document.getElementById('portionGrams').value=100;
+ document.getElementById('foodSource').textContent='Source: '+item.source+' · values per 100g; adjust portion and review before adding.';
+ updateFoodMacros();
+ document.getElementById('foodResults').innerHTML='<div class="notice">Selected: <b>'+esc(item.name)+'</b>. Nutrition has been filled in automatically.</div>';
+}
+function updateFoodMacros(){
+ if(!selectedFood)return;
+ let factor=num(document.getElementById('portionGrams').value)/100;
+ document.getElementById('foodCalories').value=(selectedFood.kcal*factor).toFixed(1);
+ document.getElementById('foodProtein').value=(selectedFood.p*factor).toFixed(1);
+ document.getElementById('foodCarbs').value=(selectedFood.c*factor).toFixed(1);
+ document.getElementById('foodFat').value=(selectedFood.f*factor).toFixed(1);
+}
+document.getElementById('portionGrams').addEventListener('input',updateFoodMacros);
+async function searchFoods(){
+ const q=document.getElementById('foodSearch').value.trim(), box=document.getElementById('foodResults');
+ if(!q){box.innerHTML='<small class="muted">Enter a food name first.</small>';return}
+ box.innerHTML='<small class="muted">Searching foods…</small>';
+ const local=commonFoods.filter(f=>f.name.toLowerCase().includes(q.toLowerCase())||q.toLowerCase().split(/\s+/).some(w=>w.length>2&&f.name.toLowerCase().includes(w)));
+ let results=local.map(f=>({...f,source:f.source+' (local estimate)'}));
+ try{
+  const url='https://world.openfoodfacts.org/cgi/search.pl?search_terms='+encodeURIComponent(q)+'&search_simple=1&action=process&json=1&page_size=8&fields=product_name,brands,nutriments,serving_size';
+  const r=await fetch(url,{headers:{'Accept':'application/json'}});
+  if(r.ok){const data=await r.json();(data.products||[]).forEach(prod=>{
+   const n=prod.nutriments||{}, kcal=Number(n['energy-kcal_100g']??n['energy-kcal']??(Number(n['energy-kj_100g'])/4.184));
+   const protein=Number(n.proteins_100g??n.proteins), carbs=Number(n.carbohydrates_100g??n.carbohydrates), fat=Number(n.fat_100g??n.fat);
+   if(prod.product_name&&Number.isFinite(kcal)&&kcal>0&&[protein,carbs,fat].every(Number.isFinite)){
+    results.push({name:prod.product_name+(prod.brands?' · '+prod.brands:''),kcal,p:protein,c:carbs,f:fat,source:'Open Food Facts · per 100g'});
+   }
+  })}
+ }catch(err){/* local food matches remain available offline */}
+ const unique=results.filter((f,i,a)=>a.findIndex(x=>x.name.toLowerCase()===f.name.toLowerCase())===i).slice(0,12);
+ if(!unique.length){box.innerHTML='<small class="muted">No match found. Try another name or enter the nutrition manually below.</small>';return}
+ box.innerHTML=unique.map((f,i)=>`<button type="button" class="btn secondary" style="text-align:left;display:flex;justify-content:space-between;gap:8px" onclick="chooseFoodResult(${i})"><span>${esc(f.name)}<br><small>${Math.round(f.kcal)} kcal · P ${f.p.toFixed(1)}g · C ${f.c.toFixed(1)}g · F ${f.f.toFixed(1)}g / 100g</small></span><span>+</span></button>`).join('');
+ window.currentFoodResults=unique;
+}
+function chooseFoodResult(i){if(window.currentFoodResults&&window.currentFoodResults[i])setFoodSelection(window.currentFoodResults[i])}
+document.getElementById('foodSearch').addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();searchFoods()}});
+let labelPhotoData=null;
+function savedNutritionLabels(){return JSON.parse(localStorage.getItem('ascendNutritionLabels')||'[]')}
+function refreshSavedLabels(){let arr=savedNutritionLabels(),wrap=document.getElementById('savedLabelsWrap'),sel=document.getElementById('savedLabels');if(!arr.length){wrap.classList.add('hidden');return}wrap.classList.remove('hidden');sel.innerHTML='<option value="">Choose a saved product</option>'+arr.map((x,i)=>`<option value="${i}">${esc(x.name)}</option>`).join('')}
+function loadSavedLabel(i){let x=savedNutritionLabels()[Number(i)];if(!x)return;let f=document.getElementById('labelForm');f.elements.labelName.value=x.name;f.elements.basis.value=x.basis;f.elements.servingSize.value=x.servingSize;f.elements.labelCalories.value=x.calories;f.elements.labelProtein.value=x.protein;f.elements.labelCarbs.value=x.carbs;f.elements.labelFat.value=x.fat;updateLabelPreview()}
+function labelValues(){let f=document.getElementById('labelForm'),o=formObj(f);let serving=num(o.servingSize),amount=num(o.amountEaten),factor=amount/Math.max(.1,serving);if(o.basis==='100')factor=amount/100;return {o,factor,calories:num(o.labelCalories)*factor,protein:num(o.labelProtein)*factor,carbs:num(o.labelCarbs)*factor,fat:num(o.labelFat)*factor}}
+function updateLabelPreview(){let x=labelValues();document.getElementById('labelPreviewMacros').textContent=x.calories.toFixed(0)+' kcal';document.getElementById('labelPreviewDetails').textContent=`P ${x.protein.toFixed(1)}g · C ${x.carbs.toFixed(1)}g · F ${x.fat.toFixed(1)}g`}
+['labelForm'].forEach(id=>{let f=document.getElementById(id);f.addEventListener('input',updateLabelPreview);f.addEventListener('change',updateLabelPreview)});
+document.getElementById('labelPhoto').addEventListener('change',e=>{let file=e.target.files&&e.target.files[0];if(!file)return;let reader=new FileReader();reader.onload=()=>{labelPhotoData=reader.result;let img=document.getElementById('labelPreview');img.src=labelPhotoData;img.classList.remove('hidden')};reader.readAsDataURL(file)});
+document.getElementById('savedLabels').addEventListener('change',e=>loadSavedLabel(e.target.value));
+document.getElementById('labelForm').onsubmit=e=>{e.preventDefault();let x=labelValues(),o=x.o;if(!o.labelName.trim()||num(o.servingSize)<=0||num(o.amountEaten)<=0){alert('Enter a product name and valid serving and eaten amounts.');return}
+ let record={food:o.labelName+' (nutrition label)',meal:o.labelMeal,calories:Number(x.calories.toFixed(1)),protein:Number(x.protein.toFixed(1)),carbs:Number(x.carbs.toFixed(1)),fat:Number(x.fat.toFixed(1)),portionGrams:num(o.amountEaten),source:'User-entered package nutrition label',time:new Date().toISOString()};
+ day().foods.push(record);
+ if(o.saveLabel==='on'){let arr=savedNutritionLabels(),item={name:o.labelName,basis:o.basis,servingSize:num(o.servingSize),calories:num(o.labelCalories),protein:num(o.labelProtein),carbs:num(o.labelCarbs),fat:num(o.labelFat)};let idx=arr.findIndex(z=>z.name.toLowerCase()===item.name.toLowerCase());if(idx>=0)arr[idx]=item;else arr.push(item);localStorage.setItem('ascendNutritionLabels',JSON.stringify(arr))}
+ save();e.target.reset();document.getElementById('labelPreview').classList.add('hidden');document.getElementById('labelPreview').removeAttribute('src');labelPhotoData=null;document.getElementById('labelPreviewMacros').textContent='0 kcal';document.getElementById('labelPreviewDetails').textContent='P 0g · C 0g · F 0g';refreshSavedLabels();render();alert('Nutrition label entry added to today’s food journal.')};
+refreshSavedLabels();
+document.getElementById('foodForm').onsubmit=e=>{e.preventDefault();let o=formObj(e.target);day().foods.push({food:o.food,meal:o.meal,calories:num(o.calories),protein:num(o.protein),carbs:num(o.carbs),fat:num(o.fat),portionGrams:num(document.getElementById('portionGrams').value),source:selectedFood?selectedFood.source:'Manual entry',time:new Date().toISOString()});save();e.target.reset();selectedFood=null;document.getElementById('foodSource').textContent='Nutrition values are estimates. Check the source and serving size.';render()};
+function removeFood(i){day().foods.splice(i,1);save();render()}
+function addWater(ml){day().water+=ml;save();render()}
+function showTab(tab){['dashboard','food','settings','scoreboard'].forEach(x=>document.getElementById(x).classList.toggle('hidden',x!==tab));document.querySelectorAll('.tabs button').forEach(b=>b.classList.toggle('active',b.dataset.tab===tab));if(tab==='settings')fillSettings()}
+document.querySelectorAll('.tabs button').forEach(b=>b.onclick=()=>showTab(b.dataset.tab));
+function fillSettings(){if(!state)return;let f=document.getElementById('settingsForm'),p=state.profile;['name','goal','nutritionMode','age','sex','height','weight','activity','diet','calories','protein','carbs','fat','waterGoal','stepTarget','sleepGoal','screenGoal','walking'].forEach(k=>{if(f.elements[k])f.elements[k].value=p[k]??''});f.elements.waterReminders.checked=p.waterReminders;f.elements.mealReminders.checked=p.mealReminders;p.meals.forEach((m,i)=>{f.elements['start'+i].value=m.start;f.elements['end'+i].value=m.end});['strengthDays','runDays'].forEach(k=>Array.from(f.querySelectorAll(`[name="${k}"]`)).forEach(c=>c.checked=(p[k]||[]).map(String).includes(c.value)));document.getElementById('themeSelect').value=localStorage.getItem('forgeTheme')||'system'}
+document.getElementById('settingsForm').onsubmit=e=>{e.preventDefault();let o=formObj(e.target);let recalculated=o.nutritionMode==='balanced'?estimateTargets(o):null;if(o.nutritionMode==='balanced'&&!recalculated){alert('Complete age, height and weight first.');return}state.profile={...state.profile,name:o.name,goal:o.goal,nutritionMode:o.nutritionMode,age:num(o.age),sex:o.sex,height:num(o.height),weight:num(o.weight),activity:num(o.activity),diet:o.diet,stepTarget:num(o.stepTarget)||10000,sleepGoal:num(o.sleepGoal)||8,screenGoal:num(o.screenGoal)||3,walking:o.walking,strengthDays:o.strengthDays||[],runDays:o.runDays||[],...(recalculated||{calories:num(o.calories),protein:num(o.protein),carbs:num(o.carbs),fat:num(o.fat)}),waterGoal:num(o.waterGoal),waterReminders:o.waterReminders==='on',mealReminders:o.mealReminders==='on',meals:mealNames.map((name,i)=>({name,start:o['start'+i],end:o['end'+i]}))};save();render();alert('Settings saved')};
+function theme(v){document.documentElement.dataset.theme=v;localStorage.setItem('forgeTheme',v);document.getElementById('themeBtn').textContent=v[0].toUpperCase()+v.slice(1)+' theme';document.getElementById('themeSelect').value=v}
+document.getElementById('themeSelect').onchange=e=>theme(e.target.value);document.getElementById('themeBtn').onclick=()=>{let v=localStorage.getItem('forgeTheme')||'system';theme(v==='system'?'dark':v==='dark'?'light':'system')};
+async function enableNotifications(){if(!('Notification'in window)){alert('Notifications are not supported in this browser.');return}let p=await Notification.requestPermission();document.getElementById('notifStatus').textContent=p==='granted'?'Permission granted':'Permission: '+p;if(p==='granted')scheduleReminders()}
+function notify(title,body){if('Notification'in window&&Notification.permission==='granted')new Notification(title,{body})}
+function scheduleReminders(){if(window.reminderTimer)clearInterval(window.reminderTimer);const check=()=>{if(!state)return;let now=new Date(),mins=now.getHours()*60+now.getMinutes(),p=state.profile;
+ if(p.waterReminders&&now.getMinutes()===0&&mins>=480&&mins<=1260)notify('Hydration break','Time to drink some water.');
+ if(p.mealReminders)p.meals.forEach(m=>{let [h,mm]=m.start.split(':').map(Number),target=h*60+mm-20;if(mins===target)notify(m.name+' coming up','Meal in 20 minutes. Plan a balanced, nourishing option.')});
+};check();window.reminderTimer=setInterval(check,60000)}
+function resetApp(){if(confirm('Delete all local app data?')){localStorage.removeItem('forgeData');location.reload()}}
+if('serviceWorker'in navigator)window.addEventListener('load',()=>navigator.serviceWorker.register('./sw.js').catch(()=>{}));
+theme(localStorage.getItem('forgeTheme')||'system');
+if(state)startApp();else document.getElementById('setup').classList.remove('hidden');
+</script>
+</body></html>
